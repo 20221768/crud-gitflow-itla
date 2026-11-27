@@ -1,3 +1,7 @@
-﻿[
-  { "id": 1, "name": "Configurar repositorio", "status": "pendiente" }
+[
+  {
+    "id": 1,
+    "name": "Configurar repositorio",
+    "status": "pendiente"
+  }
 ]
