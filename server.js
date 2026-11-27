@@ -6,11 +6,13 @@ const DATA_FILE = path.join(__dirname, "data.json");
 
 function readData() {
   if (!fs.existsSync(DATA_FILE)) return [];
-  return JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
+  const raw = fs.readFileSync(DATA_FILE, "utf8").replace(/^\uFEFF/, "").trim();
+  if (!raw) return [];
+  return JSON.parse(raw);
 }
 
 function writeData(items) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(items, null, 2));
+  fs.writeFileSync(DATA_FILE, JSON.stringify(items, null, 2), "utf8");
 }
 
 function formatDate(date = new Date()) {
@@ -30,7 +32,7 @@ const server = http.createServer((req, res) => {
     let body = "";
     req.on("data", (chunk) => (body += chunk));
     req.on("end", () => {
-      const parsed = JSON.parse(body || "{}");
+      const parsed = JSON.parse(body.replace(/^\uFEFF/, "") || "{}");
       if (!parsed.name || !parsed.name.trim()) {
         res.writeHead(400);
         return res.end(JSON.stringify({ error: "El campo name es obligatorio" }));
@@ -55,7 +57,7 @@ const server = http.createServer((req, res) => {
     let body = "";
     req.on("data", (chunk) => (body += chunk));
     req.on("end", () => {
-      const parsed = JSON.parse(body || "{}");
+      const parsed = JSON.parse(body.replace(/^\uFEFF/, "") || "{}");
       const items = readData();
       const index = items.findIndex((i) => i.id === id);
       if (index === -1) {
